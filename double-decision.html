@@ -30,221 +30,278 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { min-height: 100vh; touch-action: manipulation; }
-    body.trial-active { overflow: hidden; }
-    .app { max-width: 760px; margin: 0 auto; padding: 12px 12px 24px; }
-    .topbar { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; margin-bottom: 8px; }
+    body.session-active { overflow: hidden; }
+    .app { max-width: 800px; margin: 0 auto; padding: 12px 12px 28px; }
+    .hud { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; }
     .pill { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 8px 10px; font-size: 14px; }
-    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-    button { border: 1px solid var(--ring); color: var(--fg); background: var(--btn); border-radius: 12px; padding: 12px 14px; font-size: 16px; font-weight: 650; min-height: 48px; }
-    button:active { transform: scale(0.98); }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    button { border: 1px solid var(--ring); color: var(--fg); background: var(--btn); border-radius: 12px; padding: 12px 14px; font-size: 15px; font-weight: 650; min-height: 46px; }
     button.primary { background: var(--accent2); color: #fff; border-color: transparent; }
-    button.good { background: var(--accent); color: #08130c; border-color: transparent; }
-    button.warn { background: #f59e0b; color: #1f1300; border-color: transparent; }
+    button.good { background: var(--accent); color: #05210f; border-color: transparent; }
+    button.warn { background: #f59e0b; color: #241500; border-color: transparent; }
     .hint { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
-    .card { background: var(--card); border: 1px solid var(--ring); border-radius: 16px; padding: 12px; }
-    #stimulusWrap { aspect-ratio: 1 / 1; width: 100%; max-height: 56vh; margin: 0 auto; }
+    .card { background: var(--card); border: 1px solid var(--ring); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
+    .settings-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+    select, input[type="number"] { border-radius: 10px; border: 1px solid var(--ring); background: #0b1220; color: var(--fg); min-height: 40px; padding: 6px 8px; font-size: 15px; }
+    .tiny { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    #stimulusWrap { aspect-ratio: 1 / 1; width: 100%; max-height: 52vh; margin: 0 auto; }
     #stimulusCanvas { width: 100%; height: 100%; border-radius: 12px; background: #020617; border: 1px solid var(--ring); }
-    .hidden { display: none !important; }
     .response { margin-top: 10px; display: grid; gap: 10px; }
-    .response-prompt { margin: 0; font-size: 14px; color: var(--muted); }
+    .response-prompt { margin: 0; color: var(--muted); font-size: 14px; }
     .choice-row { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
-    .choice-btn { min-height: 64px; font-size: 20px; }
+    .choice-btn { min-height: 58px; font-size: 20px; }
     .choice-btn.selected, .ring-btn.selected { outline: 3px solid var(--accent); }
-    .ring-grid {
-      position: relative;
-      width: min(88vw, 360px);
-      height: min(88vw, 360px);
-      margin: 2px auto;
-      display: grid;
-      place-items: center;
-    }
-    .ring-btn {
-      position: absolute;
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      font-size: 14px;
-      font-weight: 700;
-      background: #0b1220;
-      border: 2px solid var(--ring);
-      color: var(--fg);
-    }
-    .ring-center { width: 92px; height: 92px; border-radius: 50%; border: 2px dashed var(--ring); display: grid; place-items: center; color: var(--muted); font-size: 12px; }
-    .summary-grid { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
-    .small { font-size: 13px; color: var(--muted); }
-    #summaryCanvas { width: 100%; max-width: 720px; height: 240px; border: 1px solid var(--ring); border-radius: 12px; background: #020617; }
-    @media (max-width: 420px) {
-      .ring-btn { width: 64px; height: 64px; }
-      .choice-btn { font-size: 18px; }
-    }
+    .ring-grid { position: relative; width: min(82vw, 340px); height: min(82vw, 340px); margin: 0 auto; display: grid; place-items: center; }
+    .ring-btn { position: absolute; width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--ring); background: #0b1220; color: var(--fg); font-weight: 700; }
+    .ring-center { width: 84px; height: 84px; border-radius: 50%; border: 2px dashed var(--ring); color: var(--muted); display: grid; place-items: center; font-size: 12px; }
+    .hidden { display: none !important; }
+    #microBreak, #pauseOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.9); z-index: 90; display: grid; place-items: center; text-align: center; padding: 20px; }
+    .overlay-card { background: var(--card); border: 1px solid var(--ring); border-radius: 16px; padding: 18px; max-width: 460px; }
+    #summaryCanvas { width: 100%; height: 230px; border: 1px solid var(--ring); border-radius: 12px; background: #020617; margin-top: 10px; }
     @media (max-width: 760px) {
-      body { overflow-x: hidden; }
-      .app { padding-bottom: calc(250px + env(safe-area-inset-bottom)); }
-      .controls { margin-bottom: 8px; }
-      #stimulusWrap { max-height: 44vh; }
-      #responsePanel {
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        bottom: calc(10px + env(safe-area-inset-bottom));
-        z-index: 50;
-        margin-top: 0;
-        padding: 12px;
-        background: rgba(17, 24, 39, 0.96);
-        border: 1px solid var(--ring);
-        border-radius: 16px;
-        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
-      }
-      .ring-grid {
-        width: min(72vw, 320px);
-        height: min(72vw, 320px);
-      }
-      .ring-btn {
-        width: 58px;
-        height: 58px;
-        font-size: 12px;
-      }
-      .choice-btn { min-height: 54px; }
+      .app { padding-bottom: calc(240px + env(safe-area-inset-bottom)); }
+      #responsePanel { position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 40; margin-top: 0; background: rgba(17,24,39,.96); border: 1px solid var(--ring); border-radius: 16px; padding: 12px; box-shadow: 0 10px 26px rgba(0,0,0,.42); }
+      .ring-grid { width: min(72vw, 300px); height: min(72vw, 300px); }
+      .ring-btn { width: 54px; height: 54px; font-size: 12px; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="topbar">
+    <div class="hud">
       <div class="pill" id="status">Ready</div>
-      <div class="pill" id="stats">Level 1 · D 500ms</div>
+      <div class="pill" id="hudMain">Time 06:00 · Level 1 · D 500ms · Last ○ ○</div>
+      <div class="pill" id="hudSecondary">Trials 0 · Reversals 0</div>
+      <div class="pill" id="bestPill">Best level 1</div>
     </div>
 
     <div class="controls">
-      <button class="primary" id="startBtn">Start Session</button>
-      <button id="practiceBtn">Practice</button>
+      <button class="primary" id="startBtn">Start</button>
+      <button id="pauseBtn">Pause</button>
       <button id="contrastBtn">High Contrast: Off</button>
-      <button id="fullscreenBtn">Full screen hint</button>
       <button class="warn" id="resetBtn">Reset Data</button>
     </div>
 
-    <p class="hint">Instruction: watch fixation, then identify center object (car/truck) and peripheral target location. Select both after the flash. Success = both correct.</p>
+    <p class="hint">Watch fixation, then identify center object (car/truck) and peripheral target location. Success = both correct.</p>
 
     <div class="card">
-      <div id="stimulusWrap">
-        <canvas id="stimulusCanvas" width="720" height="720" aria-label="Stimulus display"></canvas>
-      </div>
+      <details id="settingsPanel" open>
+        <summary><strong>Settings</strong></summary>
+        <div class="settings-grid" style="margin-top:10px">
+          <label>Mode
+            <select id="modeSelect">
+              <option value="timed">Timed session</option>
+              <option value="trials">Trial-count session</option>
+            </select>
+          </label>
+          <label>Minutes (3–12)
+            <input id="minutesInput" type="number" min="3" max="12" value="6" />
+          </label>
+          <label>Trials (20–80)
+            <input id="trialsInput" type="number" min="20" max="80" value="45" />
+          </label>
+          <label>Staircase
+            <select id="staircaseSelect">
+              <option value="2d1u">2-down/1-up (recommended)</option>
+              <option value="1u1d">1-up/1-down</option>
+            </select>
+          </label>
+          <label>Initial Step (ms)
+            <input id="stepInput" type="number" min="10" max="80" value="40" />
+          </label>
+          <label>Auto fine-step (40→20)
+            <select id="autoStepSelect">
+              <option value="on">On</option>
+              <option value="off">Off</option>
+            </select>
+          </label>
+        </div>
+        <p class="tiny">Tooltip: 1-up/1-down targets ~50% success. 2-down/1-up targets ~70.7% success.</p>
+      </details>
+    </div>
 
+    <div class="card">
+      <div id="stimulusWrap"><canvas id="stimulusCanvas" width="720" height="720"></canvas></div>
       <div id="responsePanel" class="response hidden">
         <p class="response-prompt">Choose object + location, then submit.</p>
         <div class="choice-row">
           <button class="choice-btn" data-choice="car">Car</button>
           <button class="choice-btn" data-choice="truck">Truck</button>
         </div>
-        <div class="ring-grid" id="ringGrid">
-          <div class="ring-center">Tap location</div>
-        </div>
-        <button class="good" id="submitResponse" disabled>Submit Answer</button>
+        <div class="ring-grid" id="ringGrid"><div class="ring-center">Tap location</div></div>
+        <button class="good" id="submitResponse" disabled>Submit</button>
       </div>
     </div>
 
-    <div class="card" style="margin-top:10px">
-      <div class="summary-grid">
-        <div id="liveSummary"></div>
-        <div id="persistSummary" class="small"></div>
-      </div>
-      <canvas id="summaryCanvas" width="720" height="240" class="hidden"></canvas>
+    <div class="card">
+      <div id="summaryText"></div>
+      <canvas id="summaryCanvas" class="hidden" width="720" height="240"></canvas>
+      <div class="tiny" id="recentSessions"></div>
     </div>
   </div>
+
+  <div id="microBreak" class="hidden"><div class="overlay-card" id="microBreakText"></div></div>
+  <div id="pauseOverlay" class="hidden"><div class="overlay-card"><h2>Paused</h2><p>Tap resume when ready.</p><button class="primary" id="resumeBtn">Resume</button></div></div>
 
 <script>
 (() => {
   'use strict';
+  const FIX_MS = 280, FEEDBACK_MS = 320, ITI_MS = 350, ITI_JITTER = 150;
+  const D_START = 500, D_MIN = 60, D_MAX = 900;
+  const BREAK_TRIAL_INTERVAL = 10, BREAK_TIME_INTERVAL_MS = 75000;
+  const STORE_KEY = 'dd_sessions_v2';
+  const BEST_KEY = 'dd_best_level_v2';
+  const K_REVERSALS = 6;
 
-  const BLOCKS = 5;
-  const TRIALS_PER_BLOCK = 20;
-  const FIX_MS = 300;
-  const MIN_D = 60;
-  const MAX_D = 1200;
-  const STEP = 40;
+  const positions = [
+    {x: 0, y: -1, label: 'N'}, {x: 0.7, y: -0.7, label: 'NE'}, {x: 1, y: 0, label: 'E'}, {x: 0.7, y: 0.7, label: 'SE'},
+    {x: 0, y: 1, label: 'S'}, {x: -0.7, y: 0.7, label: 'SW'}, {x: -1, y: 0, label: 'W'}, {x: -0.7, y: -0.7, label: 'NW'}
+  ];
 
   const els = {
     body: document.body,
     status: document.getElementById('status'),
-    stats: document.getElementById('stats'),
+    hudMain: document.getElementById('hudMain'),
+    hudSecondary: document.getElementById('hudSecondary'),
+    bestPill: document.getElementById('bestPill'),
     startBtn: document.getElementById('startBtn'),
-    practiceBtn: document.getElementById('practiceBtn'),
+    pauseBtn: document.getElementById('pauseBtn'),
     contrastBtn: document.getElementById('contrastBtn'),
-    fullscreenBtn: document.getElementById('fullscreenBtn'),
     resetBtn: document.getElementById('resetBtn'),
+    modeSelect: document.getElementById('modeSelect'),
+    minutesInput: document.getElementById('minutesInput'),
+    trialsInput: document.getElementById('trialsInput'),
+    staircaseSelect: document.getElementById('staircaseSelect'),
+    stepInput: document.getElementById('stepInput'),
+    autoStepSelect: document.getElementById('autoStepSelect'),
+    settingsPanel: document.getElementById('settingsPanel'),
     canvas: document.getElementById('stimulusCanvas'),
     response: document.getElementById('responsePanel'),
+    ringGrid: document.getElementById('ringGrid'),
     submit: document.getElementById('submitResponse'),
-    liveSummary: document.getElementById('liveSummary'),
-    persistSummary: document.getElementById('persistSummary'),
+    summaryText: document.getElementById('summaryText'),
     summaryCanvas: document.getElementById('summaryCanvas'),
-    ringGrid: document.getElementById('ringGrid')
+    recentSessions: document.getElementById('recentSessions'),
+    microBreak: document.getElementById('microBreak'),
+    microBreakText: document.getElementById('microBreakText'),
+    pauseOverlay: document.getElementById('pauseOverlay'),
+    resumeBtn: document.getElementById('resumeBtn')
   };
   const ctx = els.canvas.getContext('2d');
 
-  const positions = [
-    {x: 0, y: -1, label: 'N'}, {x: 0.7, y: -0.7, label: 'NE'},
-    {x: 1, y: 0, label: 'E'}, {x: 0.7, y: 0.7, label: 'SE'},
-    {x: 0, y: 1, label: 'S'}, {x: -0.7, y: 0.7, label: 'SW'},
-    {x: -1, y: 0, label: 'W'}, {x: -0.7, y: -0.7, label: 'NW'}
-  ];
-
   const state = {
     running: false,
-    practice: false,
-    block: 1,
-    trial: 0,
-    D: 500,
+    paused: false,
+    trialInProgress: false,
+    sessionStart: 0,
+    sessionEndTarget: 0,
+    pauseStartedAt: 0,
+    pausedAccumulated: 0,
+    mode: 'timed',
+    minutes: 6,
+    trialLimit: 45,
+    staircase: '2d1u',
+    autoFineStep: true,
+    baseStep: 40,
+    D: D_START,
+    distractors: 2,
+    similarityTier: 0,
     level: 1,
-    difficultyTier: 0,
-    trialStartMs: 0,
+    bestLevel: Number(localStorage.getItem(BEST_KEY) || 1),
+    trials: [],
+    lastIcons: ['○', '○'],
+    currentTrial: null,
     pickCenter: null,
     pickPeripheral: null,
-    current: null,
-    allTrials: [],
-    blockStats: []
+    trialStartRT: 0,
+    consecutiveSuccess: 0,
+    lastDirection: 0,
+    reversals: [],
+    breakTimerStart: 0,
+    microBreakActive: false
   };
 
-  function resizeCanvas() {
-    const r = els.canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const size = Math.floor(Math.min(r.width, r.height) * dpr);
-    if (size > 0) {
-      els.canvas.width = size;
-      els.canvas.height = size;
-      drawIdle();
-    }
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const randInt = (n) => Math.floor(Math.random() * n);
+  const mean = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  const median = (arr) => {
+    if (!arr.length) return 0;
+    const sorted = [...arr].sort((a, b) => a - b);
+    const m = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[m] : (sorted[m - 1] + sorted[m]) / 2;
+  };
+  const percentile = (arr, p) => {
+    if (!arr.length) return 0;
+    const sorted = [...arr].sort((a, b) => a - b);
+    const i = (sorted.length - 1) * p;
+    const lo = Math.floor(i), hi = Math.ceil(i);
+    return lo === hi ? sorted[lo] : sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+  };
+
+  function effectiveNow() {
+    const rawNow = Date.now();
+    const pausedPart = state.paused ? (rawNow - state.pauseStartedAt) : 0;
+    return rawNow - state.pausedAccumulated - pausedPart;
   }
 
-  function randInt(n) { return Math.floor(Math.random() * n); }
-  function choose(arr) { return arr[randInt(arr.length)]; }
+  function levelFromDifficulty() {
+    const durationComponent = Math.round((D_MAX - state.D) / 20);
+    return Math.max(1, 1 + durationComponent + state.distractors * 2 + state.similarityTier * 3);
+  }
 
-  function drawIdle() {
-    clearCanvas();
-    drawText('Ready', 0.5, 0.5, 0.06, '#94a3b8');
+  function getStepSize() {
+    if (!state.autoFineStep) return state.baseStep;
+    const elapsed = effectiveNow() - state.sessionStart;
+    if (elapsed >= 120000 || state.trials.length >= 15) return 20;
+    return state.baseStep;
+  }
+
+  function getSettings() {
+    state.mode = els.modeSelect.value;
+    state.minutes = Math.min(12, Math.max(3, Number(els.minutesInput.value) || 6));
+    state.trialLimit = Math.min(80, Math.max(20, Number(els.trialsInput.value) || 45));
+    state.staircase = els.staircaseSelect.value;
+    state.baseStep = Math.min(80, Math.max(10, Number(els.stepInput.value) || 40));
+    state.autoFineStep = els.autoStepSelect.value === 'on';
+  }
+
+  function updateHUD() {
+    const trialCount = state.trials.length;
+    const remaining = state.mode === 'timed'
+      ? Math.max(0, state.sessionEndTarget - effectiveNow())
+      : Math.max(0, state.trialLimit - trialCount);
+    const remText = state.mode === 'timed'
+      ? `Time ${String(Math.floor(remaining / 60000)).padStart(2, '0')}:${String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0')}`
+      : `Trials left ${remaining}`;
+    els.hudMain.textContent = `${remText} · Level ${state.level} · D ${state.D}ms · Last ${state.lastIcons.join(' ')}`;
+    els.hudSecondary.textContent = `Trials ${trialCount} · Reversals ${state.reversals.length} · N ${state.distractors}`;
+    els.bestPill.textContent = `Best level ${state.bestLevel}`;
   }
 
   function clearCanvas() {
-    const w = els.canvas.width, h = els.canvas.height;
-    ctx.clearRect(0, 0, w, h);
+    ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
     ctx.fillStyle = '#020617';
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(0, 0, els.canvas.width, els.canvas.height);
   }
 
   function drawText(t, xN, yN, sizeN, color) {
-    const w = els.canvas.width, h = els.canvas.height;
+    const w = els.canvas.width;
     ctx.fillStyle = color;
     ctx.font = `${Math.floor(w * sizeN)}px -apple-system, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(t, w * xN, h * yN);
+    ctx.fillText(t, els.canvas.width * xN, els.canvas.height * yN);
+  }
+
+  function drawIdle(message = 'Ready') {
+    clearCanvas();
+    drawText(message, 0.5, 0.5, 0.06, '#94a3b8');
   }
 
   function drawFixation() {
     clearCanvas();
-    const w = els.canvas.width, h = els.canvas.height;
-    const cx = w / 2, cy = h / 2;
-    const s = w * 0.04;
+    const w = els.canvas.width, cx = w / 2, cy = w / 2, s = w * 0.04;
     ctx.strokeStyle = '#f8fafc';
     ctx.lineWidth = Math.max(2, w * 0.006);
     ctx.beginPath();
@@ -254,52 +311,25 @@
   }
 
   function drawCar(cx, cy, scale, similarity) {
-    const w = scale;
-    const h = scale * (0.34 + similarity * 0.03);
+    const w = scale, h = scale * (0.34 + similarity * 0.05);
     ctx.fillStyle = '#60a5fa';
     ctx.fillRect(cx - w * 0.4, cy - h * 0.2, w * 0.8, h * 0.4);
-
     ctx.fillStyle = '#1d4ed8';
     ctx.beginPath();
     ctx.moveTo(cx - w * 0.2, cy - h * 0.2);
     ctx.quadraticCurveTo(cx - w * 0.02, cy - h * 0.52, cx + w * 0.24, cy - h * 0.2);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#bfdbfe';
-    ctx.fillRect(cx - w * 0.08, cy - h * 0.36, w * 0.2, h * 0.13);
-
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = Math.max(2, w * 0.015);
-    ctx.beginPath();
-    ctx.moveTo(cx - w * 0.4, cy - h * 0.2);
-    ctx.lineTo(cx + w * 0.4, cy - h * 0.2);
-    ctx.stroke();
-
+    ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#111827';
     ctx.beginPath(); ctx.arc(cx - w * 0.24, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(cx + w * 0.24, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
   }
 
   function drawTruck(cx, cy, scale, similarity) {
-    const w = scale;
-    const h = scale * (0.4 - similarity * 0.04);
+    const w = scale, h = scale * (0.4 - similarity * 0.08);
     ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(cx - w * 0.45, cy - h * 0.2, w * (0.52 + similarity * 0.12), h * 0.42);
-
+    ctx.fillRect(cx - w * 0.45, cy - h * 0.2, w * (0.52 + similarity * 0.2), h * 0.42);
     ctx.fillStyle = '#b45309';
-    ctx.fillRect(cx + w * (0.03 + similarity * 0.06), cy - h * 0.18, w * (0.3 - similarity * 0.08), h * 0.4);
-
-    ctx.fillStyle = '#fdba74';
-    ctx.fillRect(cx + w * 0.1, cy - h * 0.12, w * 0.12, h * 0.12);
-
-    ctx.strokeStyle = '#7c2d12';
-    ctx.lineWidth = Math.max(2, w * 0.014);
-    ctx.beginPath();
-    ctx.moveTo(cx + w * 0.03, cy - h * 0.2);
-    ctx.lineTo(cx + w * 0.03, cy + h * 0.22);
-    ctx.stroke();
-
+    ctx.fillRect(cx + w * (0.03 + similarity * 0.1), cy - h * 0.18, w * (0.3 - similarity * 0.12), h * 0.4);
     ctx.fillStyle = '#111827';
     ctx.beginPath(); ctx.arc(cx - w * 0.24, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(cx + w * 0.03, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
@@ -307,24 +337,18 @@
   }
 
   function drawPeripheral(targetIdx, distractorCount) {
-    const w = els.canvas.width, h = els.canvas.height;
-    const cx = w / 2, cy = h / 2;
-    const r = w * 0.34;
-    const distractorIndices = positions.map((_, i) => i).filter(i => i !== targetIdx);
-    for (let i = distractorIndices.length - 1; i > 0; i--) {
+    const w = els.canvas.width, cx = w / 2, cy = w / 2, r = w * 0.34;
+    const pool = positions.map((_, i) => i).filter((i) => i !== targetIdx);
+    for (let i = pool.length - 1; i > 0; i--) {
       const j = randInt(i + 1);
-      [distractorIndices[i], distractorIndices[j]] = [distractorIndices[j], distractorIndices[i]];
+      [pool[i], pool[j]] = [pool[j], pool[i]];
     }
-    const activeDistractors = new Set(distractorIndices.slice(0, Math.min(distractorCount, 7)));
-
+    const activeDistractors = new Set(pool.slice(0, Math.min(7, distractorCount)));
     positions.forEach((p, i) => {
-      const x = cx + p.x * r;
-      const y = cy + p.y * r;
+      const x = cx + p.x * r, y = cy + p.y * r;
       if (i === targetIdx) {
         ctx.fillStyle = '#22c55e';
-        ctx.beginPath();
-        ctx.arc(x, y, w * 0.03, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, w * 0.03, 0, Math.PI * 2); ctx.fill();
       } else if (activeDistractors.has(i)) {
         ctx.strokeStyle = '#f87171';
         ctx.lineWidth = Math.max(2, w * 0.004);
@@ -334,13 +358,24 @@
     });
   }
 
-  function flashStimulus(trialDef) {
+  function flashStimulus(trial) {
     clearCanvas();
-    drawPeripheral(trialDef.peripheral, trialDef.distractors);
+    drawPeripheral(trial.peripheral, trial.distractors);
+    const similarity = Math.min(0.95, state.similarityTier * 0.28);
     const w = els.canvas.width;
-    const similarity = Math.min(0.9, state.difficultyTier * 0.25);
-    if (trialDef.central === 'car') drawCar(w / 2, w / 2, w * 0.32, similarity);
+    if (trial.central === 'car') drawCar(w / 2, w / 2, w * 0.32, similarity);
     else drawTruck(w / 2, w / 2, w * 0.32, similarity);
+  }
+
+  function resizeCanvas() {
+    const rect = els.canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const size = Math.floor(Math.min(rect.width, rect.height) * dpr);
+    if (size > 0) {
+      els.canvas.width = size;
+      els.canvas.height = size;
+      drawIdle(state.running ? 'Get ready' : 'Ready');
+    }
   }
 
   function buildRingSelector() {
@@ -348,15 +383,13 @@
       const b = document.createElement('button');
       b.className = 'ring-btn';
       b.textContent = p.label;
-      b.dataset.idx = String(i);
       const angle = Math.atan2(p.y, p.x);
-      const rr = 41;
-      b.style.left = `calc(50% + ${Math.cos(angle) * rr}%)`;
-      b.style.top = `calc(50% + ${Math.sin(angle) * rr}%)`;
+      b.style.left = `calc(50% + ${Math.cos(angle) * 41}%)`;
+      b.style.top = `calc(50% + ${Math.sin(angle) * 41}%)`;
       b.style.transform = 'translate(-50%, -50%)';
       b.addEventListener('click', () => {
         state.pickPeripheral = i;
-        [...els.ringGrid.querySelectorAll('.ring-btn')].forEach(el => el.classList.remove('selected'));
+        [...els.ringGrid.querySelectorAll('.ring-btn')].forEach((el) => el.classList.remove('selected'));
         b.classList.add('selected');
         refreshSubmit();
       });
@@ -368,316 +401,339 @@
     els.submit.disabled = !(state.pickCenter && Number.isInteger(state.pickPeripheral));
   }
 
-  function setStatus(msg) { els.status.textContent = msg; }
-
-  function updateStatsLabel() {
-    els.stats.textContent = `Level ${state.level} · D ${state.D}ms · Tier ${state.difficultyTier}`;
+  function resetSelections() {
+    state.pickCenter = null;
+    state.pickPeripheral = null;
+    [...document.querySelectorAll('.choice-btn')].forEach((b) => b.classList.remove('selected'));
+    [...els.ringGrid.querySelectorAll('.ring-btn')].forEach((b) => b.classList.remove('selected'));
+    refreshSubmit();
   }
 
-  function getTrialDef() {
-    const baseDistractors = state.practice ? 1 : 2;
+  function makeTrialDef() {
     return {
       central: Math.random() < 0.5 ? 'car' : 'truck',
       peripheral: randInt(8),
-      distractors: Math.min(7, baseDistractors + state.difficultyTier * 2)
+      distractors: state.distractors
     };
   }
 
-  async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-  function vibrate(pattern) {
-    if (navigator.vibrate) navigator.vibrate(pattern);
+  function registerDirection(newDirection) {
+    if (state.lastDirection !== 0 && newDirection !== state.lastDirection) {
+      state.reversals.push({ trial: state.trials.length, D: state.D });
+    }
+    state.lastDirection = newDirection;
   }
 
-  async function runTrial() {
-    state.pickCenter = null;
-    state.pickPeripheral = null;
-    refreshSubmit();
-    [...document.querySelectorAll('.choice-btn')].forEach(b => b.classList.remove('selected'));
-    [...els.ringGrid.querySelectorAll('.ring-btn')].forEach(b => b.classList.remove('selected'));
+  function adjustDifficulty(success) {
+    const step = getStepSize();
+    let direction = 0;
+    if (state.staircase === '1u1d') {
+      if (success) {
+        if (state.D > D_MIN) {
+          state.D = Math.max(D_MIN, state.D - step);
+          direction = -1;
+        } else if (state.distractors < 7) {
+          state.distractors += 1;
+          direction = -1;
+        } else if (state.similarityTier < 3) {
+          state.similarityTier += 1;
+          direction = -1;
+        }
+      } else {
+        if (state.distractors > 2) {
+          state.distractors -= 1;
+          direction = 1;
+        } else if (state.D < D_MAX) {
+          state.D = Math.min(D_MAX, state.D + step);
+          direction = 1;
+        }
+      }
+    } else {
+      if (success) {
+        state.consecutiveSuccess += 1;
+        if (state.consecutiveSuccess >= 2) {
+          if (state.D > D_MIN) {
+            state.D = Math.max(D_MIN, state.D - step);
+            direction = -1;
+          } else if (state.distractors < 7) {
+            state.distractors += 1;
+            direction = -1;
+          } else if (state.similarityTier < 3) {
+            state.similarityTier += 1;
+            direction = -1;
+          }
+          state.consecutiveSuccess = 0;
+        }
+      } else {
+        state.consecutiveSuccess = 0;
+        if (state.distractors > 2) {
+          state.distractors -= 1;
+          direction = 1;
+        } else if (state.D < D_MAX) {
+          state.D = Math.min(D_MAX, state.D + step);
+          direction = 1;
+        }
+      }
+    }
+    if (direction !== 0) registerDirection(direction);
+    state.level = levelFromDifficulty();
+    state.bestLevel = Math.max(state.bestLevel, state.level);
+    localStorage.setItem(BEST_KEY, String(state.bestLevel));
+  }
 
-    state.current = getTrialDef();
-    els.body.classList.add('trial-active');
+  function thresholdEstimate() {
+    if (state.reversals.length <= 2) return null;
+    const ds = state.reversals.slice(2).map((r) => r.D);
+    const windowed = ds.slice(-K_REVERSALS);
+    if (!windowed.length) return null;
+    return Math.round(mean(windowed));
+  }
+
+  function shouldEndSession() {
+    if (state.mode === 'timed') return effectiveNow() >= state.sessionEndTarget;
+    return state.trials.length >= state.trialLimit;
+  }
+
+  async function maybeMicroBreak() {
+    const elapsedSinceBreak = effectiveNow() - state.breakTimerStart;
+    const dueByTrials = state.trials.length > 0 && state.trials.length % BREAK_TRIAL_INTERVAL === 0;
+    const dueByTime = elapsedSinceBreak >= BREAK_TIME_INTERVAL_MS;
+    if (!dueByTrials && !dueByTime) return;
+    state.microBreakActive = true;
+    els.microBreakText.innerHTML = `<h3>Breathe / reset</h3><p>Level ${state.level}<br>Best-so-far ${state.bestLevel}</p><p class="tiny">Auto resume...</p>`;
+    els.microBreak.classList.remove('hidden');
+    await sleep(1700);
+    els.microBreak.classList.add('hidden');
+    state.breakTimerStart = effectiveNow();
+    state.microBreakActive = false;
+  }
+
+  async function runTrialLoop() {
+    if (!state.running || state.paused || state.microBreakActive || shouldEndSession()) return;
+    state.trialInProgress = true;
+    resetSelections();
+    state.currentTrial = makeTrialDef();
+    els.body.classList.add('session-active');
     els.response.classList.add('hidden');
-
-    setStatus(`Block ${state.block}/${BLOCKS} · Trial ${state.trial + 1}/${TRIALS_PER_BLOCK}`);
     drawFixation();
     await sleep(FIX_MS);
+    if (!state.running || state.paused) return;
 
-    flashStimulus(state.current);
+    flashStimulus(state.currentTrial);
     await sleep(state.D);
+    if (!state.running || state.paused) return;
 
     clearCanvas();
-    state.trialStartMs = performance.now();
+    state.trialStartRT = performance.now();
     els.response.classList.remove('hidden');
-    els.body.classList.remove('trial-active');
+    els.body.classList.remove('session-active');
+    state.trialInProgress = false;
+    updateHUD();
   }
 
-  function evaluateAndAdvance() {
-    const rt = Math.round(performance.now() - state.trialStartMs);
-    const centralOk = state.pickCenter === state.current.central;
-    const peripheralOk = state.pickPeripheral === state.current.peripheral;
+  async function submitResponse() {
+    if (!state.running || state.paused || !state.currentTrial) return;
+    const rt = Math.round(performance.now() - state.trialStartRT);
+    const centralOk = state.pickCenter === state.currentTrial.central;
+    const peripheralOk = state.pickPeripheral === state.currentTrial.peripheral;
     const success = centralOk && peripheralOk;
+    state.lastIcons = [centralOk ? '✅' : '❌', peripheralOk ? '✅' : '❌'];
 
-    state.allTrials.push({
-      block: state.block,
-      trial: state.trial + 1,
+    const trial = {
+      n: state.trials.length + 1,
       D: state.D,
       level: state.level,
-      tier: state.difficultyTier,
-      rt,
+      distractors: state.distractors,
       centralOk,
       peripheralOk,
-      success
-    });
+      success,
+      rt
+    };
+    state.trials.push(trial);
+    adjustDifficulty(success);
 
-    if (success) {
-      if (state.D > MIN_D) {
-        state.D = Math.max(MIN_D, state.D - STEP);
-      } else {
-        state.difficultyTier = Math.min(4, state.difficultyTier + 1);
-        state.level += 1;
-      }
-      vibrate(10);
-    } else {
-      state.D = Math.min(MAX_D, state.D + STEP);
-      if (state.difficultyTier > 0 && state.D > 260) {
-        state.difficultyTier -= 1;
-        state.level = Math.max(1, state.level - 1);
-      }
-      vibrate([20, 20, 20]);
-    }
+    clearCanvas();
+    drawText(success ? '✔' : '✖', 0.5, 0.48, 0.14, success ? '#22c55e' : '#ef4444');
+    drawText(`${state.lastIcons.join('  ')}`, 0.5, 0.62, 0.06, '#cbd5e1');
+    await sleep(FEEDBACK_MS);
 
-    updateStatsLabel();
-    updateLiveSummary();
-
-    state.trial += 1;
-    if (state.trial >= TRIALS_PER_BLOCK) {
-      finishBlock();
-    } else {
-      runTrial();
-    }
-  }
-
-  function finishBlock() {
-    const blockTrials = state.allTrials.filter(t => t.block === state.block);
-    const acc = mean(blockTrials.map(t => t.success ? 1 : 0));
-    const rt = mean(blockTrials.map(t => t.rt));
-    state.blockStats.push({ block: state.block, acc, rt });
-
-    if (state.block >= BLOCKS || state.practice) {
+    updateHUD();
+    if (shouldEndSession()) {
       endSession();
       return;
     }
 
-    setStatus(`Break: Block ${state.block} complete. Tap Start Session to continue.`);
-    els.startBtn.textContent = `Continue Block ${state.block + 1}`;
-    state.block += 1;
-    state.trial = 0;
-    state.running = false;
+    await maybeMicroBreak();
+    await sleep(ITI_MS + randInt(ITI_JITTER + 1));
+    await runTrialLoop();
   }
 
-  function mean(arr) {
-    if (!arr.length) return 0;
-    return arr.reduce((a, b) => a + b, 0) / arr.length;
-  }
-
-  function updateLiveSummary() {
-    const n = state.allTrials.length;
-    const accC = mean(state.allTrials.map(t => t.centralOk ? 1 : 0)) * 100;
-    const accP = mean(state.allTrials.map(t => t.peripheralOk ? 1 : 0)) * 100;
-    const accS = mean(state.allTrials.map(t => t.success ? 1 : 0)) * 100;
-    const rt = mean(state.allTrials.map(t => t.rt));
-
-    els.liveSummary.innerHTML = `
-      <strong>Session live</strong><br>
-      Trials: ${n}<br>
-      Central: ${accC.toFixed(1)}%<br>
-      Peripheral: ${accP.toFixed(1)}%<br>
-      Combined: ${accS.toFixed(1)}%<br>
-      Mean RT: ${isFinite(rt) ? rt.toFixed(0) : 0}ms
-    `;
-  }
-
-  function saveSession() {
-    const best = Number(localStorage.getItem('dd_best_level') || 1);
-    if (state.level > best) localStorage.setItem('dd_best_level', String(state.level));
-
-    const sessions = JSON.parse(localStorage.getItem('dd_sessions') || '[]');
-    const summary = {
-      ts: Date.now(),
-      mode: state.practice ? 'practice' : 'main',
-      level: state.level,
-      meanRT: Math.round(mean(state.allTrials.map(t => t.rt))),
-      combinedAcc: Math.round(mean(state.allTrials.map(t => t.success ? 1 : 0)) * 100)
-    };
-    sessions.unshift(summary);
-    localStorage.setItem('dd_sessions', JSON.stringify(sessions.slice(0, 10)));
-  }
-
-  function renderPersistence() {
-    const best = Number(localStorage.getItem('dd_best_level') || 1);
-    const sessions = JSON.parse(localStorage.getItem('dd_sessions') || '[]');
-    const rows = sessions.map(s => {
-      const d = new Date(s.ts);
-      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}: ${s.mode}, lvl ${s.level}, acc ${s.combinedAcc}%, RT ${s.meanRT}ms`;
-    }).join('<br>');
-
-    els.persistSummary.innerHTML = `<strong>Saved</strong><br>Best level: ${best}<br>${rows || 'No sessions yet.'}`;
-  }
-
-  function drawSummaryChart() {
+  function drawSummarySeries() {
     const c = els.summaryCanvas;
     const g = c.getContext('2d');
     g.clearRect(0, 0, c.width, c.height);
-    g.fillStyle = '#020617';
-    g.fillRect(0, 0, c.width, c.height);
-
-    const m = {l: 48, r: 12, t: 16, b: 30};
-    const w = c.width - m.l - m.r;
-    const h = c.height - m.t - m.b;
-
-    g.strokeStyle = '#475569';
-    g.strokeRect(m.l, m.t, w, h);
-
-    const data = state.blockStats;
-    if (!data.length) return;
-
-    g.fillStyle = '#94a3b8';
-    g.font = '12px sans-serif';
-    g.fillText('Accuracy %', 6, 20);
-    g.fillText('RT ms', 6, 38);
-
-    const maxRt = Math.max(500, ...data.map(d => d.rt));
-
-    g.strokeStyle = '#22c55e';
-    g.lineWidth = 3;
-    g.beginPath();
-    data.forEach((d, i) => {
-      const x = m.l + (i / Math.max(1, data.length - 1)) * w;
-      const y = m.t + (1 - d.acc) * h;
+    g.fillStyle = '#020617'; g.fillRect(0, 0, c.width, c.height);
+    if (!state.trials.length) return;
+    const m = { l: 44, r: 12, t: 12, b: 28 }, w = c.width - m.l - m.r, h = c.height - m.t - m.b;
+    g.strokeStyle = '#334155'; g.strokeRect(m.l, m.t, w, h);
+    g.fillStyle = '#94a3b8'; g.font = '12px sans-serif'; g.fillText('D (ms)', 8, 20);
+    g.fillText('Trials', c.width - 50, c.height - 8);
+    g.strokeStyle = '#38bdf8'; g.lineWidth = 2; g.beginPath();
+    state.trials.forEach((t, i) => {
+      const x = m.l + (i / Math.max(1, state.trials.length - 1)) * w;
+      const y = m.t + (1 - ((t.D - D_MIN) / (D_MAX - D_MIN))) * h;
       if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
-      g.fillStyle = '#22c55e';
-      g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#e2e8f0';
-      g.fillText(`B${d.block}`, x - 10, c.height - 10);
     });
     g.stroke();
+  }
 
-    g.strokeStyle = '#38bdf8';
-    g.lineWidth = 2;
-    g.beginPath();
-    data.forEach((d, i) => {
-      const x = m.l + (i / Math.max(1, data.length - 1)) * w;
-      const y = m.t + (d.rt / maxRt) * h;
-      if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
-      g.fillStyle = '#38bdf8';
-      g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill();
-    });
-    g.stroke();
+  function saveSessionSummary(summary) {
+    const sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    sessions.unshift(summary);
+    localStorage.setItem(STORE_KEY, JSON.stringify(sessions.slice(0, 10)));
+  }
+
+  function renderRecentSessions() {
+    const sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    els.recentSessions.innerHTML = '<strong>Last 10 sessions</strong><br>' + (sessions.length ? sessions.map((s) => {
+      const d = new Date(s.ts);
+      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} · L${s.bestLevel} · thr ${s.threshold || 'n/a'}ms · both ${s.bothAcc}%`;
+    }).join('<br>') : 'No sessions yet.');
   }
 
   function endSession() {
     state.running = false;
+    state.paused = false;
+    els.pauseOverlay.classList.add('hidden');
     els.response.classList.add('hidden');
-    clearCanvas();
-    drawText('Session Complete', 0.5, 0.48, 0.06, '#f8fafc');
-    drawText('See summary below', 0.5, 0.56, 0.035, '#94a3b8');
+    els.body.classList.remove('session-active');
+    drawIdle('Session complete');
+    els.startBtn.textContent = 'Start';
+    els.settingsPanel.open = true;
 
-    saveSession();
-    renderPersistence();
-    drawSummaryChart();
+    const centralAcc = mean(state.trials.map((t) => t.centralOk ? 1 : 0)) * 100;
+    const peripheralAcc = mean(state.trials.map((t) => t.peripheralOk ? 1 : 0)) * 100;
+    const bothAcc = mean(state.trials.map((t) => t.success ? 1 : 0)) * 100;
+    const rts = state.trials.map((t) => t.rt);
+    const medRT = median(rts);
+    const iqr = percentile(rts, 0.75) - percentile(rts, 0.25);
+    const threshold = thresholdEstimate();
+
+    els.summaryText.innerHTML = `
+      <strong>Session summary</strong><br>
+      Best level reached: ${state.bestLevel}<br>
+      Estimated threshold: ${threshold === null ? 'Not enough reversals yet' : `${threshold}ms`} · Reversals ${state.reversals.length}<br>
+      Accuracy — central ${centralAcc.toFixed(1)}%, peripheral ${peripheralAcc.toFixed(1)}%, both ${bothAcc.toFixed(1)}%<br>
+      Median RT ${Math.round(medRT)}ms (IQR ${Math.round(iqr)}ms)
+    `;
+    drawSummarySeries();
     els.summaryCanvas.classList.remove('hidden');
 
-    const c = mean(state.allTrials.map(t => t.centralOk ? 1 : 0)) * 100;
-    const p = mean(state.allTrials.map(t => t.peripheralOk ? 1 : 0)) * 100;
-    const s = mean(state.allTrials.map(t => t.success ? 1 : 0)) * 100;
-    const rt = mean(state.allTrials.map(t => t.rt));
-
-    setStatus(`Done · Central ${c.toFixed(1)}% · Peripheral ${p.toFixed(1)}% · Combined ${s.toFixed(1)}% · RT ${rt.toFixed(0)}ms`);
-    els.startBtn.textContent = 'Start Session';
+    saveSessionSummary({
+      ts: Date.now(),
+      mode: state.mode,
+      bestLevel: state.bestLevel,
+      threshold,
+      reversals: state.reversals.length,
+      centralAcc: Number(centralAcc.toFixed(1)),
+      peripheralAcc: Number(peripheralAcc.toFixed(1)),
+      bothAcc: Number(bothAcc.toFixed(1)),
+      medianRT: Math.round(medRT),
+      iqr: Math.round(iqr)
+    });
+    renderRecentSessions();
+    updateHUD();
+    els.status.textContent = 'Completed';
   }
 
-  function start(modePractice) {
-    if (state.running) return;
-    if (!state.allTrials.length || (!modePractice && state.block === 1 && state.trial === 0)) {
-      state.practice = modePractice;
-      state.block = 1;
-      state.trial = 0;
-      state.level = 1;
-      state.difficultyTier = 0;
-      state.D = modePractice ? 900 : 500;
-      state.allTrials = [];
-      state.blockStats = [];
-      updateLiveSummary();
-      els.summaryCanvas.classList.add('hidden');
-    }
-
+  function startSession() {
+    getSettings();
     state.running = true;
-    setStatus(modePractice ? 'Practice mode' : `Block ${state.block}/${BLOCKS}`);
-    updateStatsLabel();
-    runTrial();
+    state.paused = false;
+    state.trialInProgress = false;
+    state.sessionStart = Date.now();
+    state.pausedAccumulated = 0;
+    state.breakTimerStart = state.sessionStart;
+    state.sessionEndTarget = state.sessionStart + state.minutes * 60000;
+    state.D = D_START;
+    state.distractors = 2;
+    state.similarityTier = 0;
+    state.level = 1;
+    state.trials = [];
+    state.lastIcons = ['○', '○'];
+    state.currentTrial = null;
+    state.consecutiveSuccess = 0;
+    state.lastDirection = 0;
+    state.reversals = [];
+    resetSelections();
+    els.summaryCanvas.classList.add('hidden');
+    els.summaryText.innerHTML = 'Session running...';
+    els.settingsPanel.open = false;
+    els.status.textContent = state.mode === 'timed' ? `Timed (${state.minutes} min)` : `Trials (${state.trialLimit})`;
+    els.startBtn.textContent = 'Restart';
+    updateHUD();
+    runTrialLoop();
   }
 
-  function onCenterChoice(e) {
-    const b = e.target.closest('.choice-btn');
-    if (!b) return;
-    state.pickCenter = b.dataset.choice;
-    [...document.querySelectorAll('.choice-btn')].forEach(el => el.classList.remove('selected'));
-    b.classList.add('selected');
-    refreshSubmit();
+  function togglePause() {
+    if (!state.running) return;
+    state.paused = !state.paused;
+    if (state.paused) {
+      state.pauseStartedAt = Date.now();
+      els.pauseOverlay.classList.remove('hidden');
+      els.status.textContent = 'Paused';
+    } else {
+      state.pausedAccumulated += Date.now() - state.pauseStartedAt;
+      els.pauseOverlay.classList.add('hidden');
+      els.status.textContent = 'Running';
+      if (!state.trialInProgress && els.response.classList.contains('hidden')) runTrialLoop();
+    }
+    updateHUD();
   }
 
   function resetData() {
-    localStorage.removeItem('dd_best_level');
-    localStorage.removeItem('dd_sessions');
-    renderPersistence();
-    setStatus('Saved data reset.');
+    localStorage.removeItem(STORE_KEY);
+    localStorage.removeItem(BEST_KEY);
+    state.bestLevel = 1;
+    renderRecentSessions();
+    updateHUD();
+    els.status.textContent = 'Saved data reset';
+  }
+
+  function setupInputs() {
+    document.querySelector('.choice-row').addEventListener('click', (e) => {
+      const b = e.target.closest('.choice-btn');
+      if (!b) return;
+      state.pickCenter = b.dataset.choice;
+      [...document.querySelectorAll('.choice-btn')].forEach((el) => el.classList.remove('selected'));
+      b.classList.add('selected');
+      refreshSubmit();
+    });
+    els.submit.addEventListener('click', submitResponse);
+    els.startBtn.addEventListener('click', startSession);
+    els.pauseBtn.addEventListener('click', togglePause);
+    els.resumeBtn.addEventListener('click', togglePause);
+    els.resetBtn.addEventListener('click', resetData);
+    els.contrastBtn.addEventListener('click', () => {
+      const on = els.body.classList.toggle('high-contrast');
+      els.contrastBtn.textContent = `High Contrast: ${on ? 'On' : 'Off'}`;
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (state.running) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+    document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+    window.addEventListener('resize', resizeCanvas);
   }
 
   function setup() {
     buildRingSelector();
-
-    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-
-    document.addEventListener('touchmove', (e) => {
-      if (document.body.classList.contains('trial-active')) e.preventDefault();
-    }, { passive: false });
-
-    document.addEventListener('gesturestart', (e) => e.preventDefault());
-    document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
-
-    els.startBtn.addEventListener('click', () => start(false));
-    els.practiceBtn.addEventListener('click', () => {
-      state.block = 1;
-      state.trial = 0;
-      state.allTrials = [];
-      state.blockStats = [];
-      start(true);
-    });
-
-    document.querySelector('.choice-row').addEventListener('click', onCenterChoice);
-    els.submit.addEventListener('click', evaluateAndAdvance);
-
-    els.contrastBtn.addEventListener('click', () => {
-      const on = els.body.classList.toggle('high-contrast');
-      els.contrastBtn.textContent = `High Contrast: ${on ? 'On' : 'Off'}`;
-      resizeCanvas();
-    });
-
-    els.fullscreenBtn.addEventListener('click', async () => {
-      setStatus('Tip: Add to Home Screen for full-screen-like play on iPhone.');
-      if (document.documentElement.requestFullscreen) {
-        try { await document.documentElement.requestFullscreen(); } catch (_) {}
-      }
-    });
-
-    els.resetBtn.addEventListener('click', resetData);
-
-    renderPersistence();
-    updateLiveSummary();
-    updateStatsLabel();
+    setupInputs();
+    renderRecentSessions();
+    updateHUD();
+    drawIdle();
   }
 
   setup();
