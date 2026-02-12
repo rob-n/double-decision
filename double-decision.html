@@ -46,6 +46,7 @@
     #stimulusCanvas { width: 100%; height: 100%; border-radius: 12px; background: #020617; border: 1px solid var(--ring); }
     .hidden { display: none !important; }
     .response { margin-top: 10px; display: grid; gap: 10px; }
+    .response-prompt { margin: 0; font-size: 14px; color: var(--muted); }
     .choice-row { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
     .choice-btn { min-height: 64px; font-size: 20px; }
     .choice-btn.selected, .ring-btn.selected { outline: 3px solid var(--accent); }
@@ -76,6 +77,35 @@
       .ring-btn { width: 64px; height: 64px; }
       .choice-btn { font-size: 18px; }
     }
+    @media (max-width: 760px) {
+      body { overflow-x: hidden; }
+      .app { padding-bottom: calc(250px + env(safe-area-inset-bottom)); }
+      .controls { margin-bottom: 8px; }
+      #stimulusWrap { max-height: 44vh; }
+      #responsePanel {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        z-index: 50;
+        margin-top: 0;
+        padding: 12px;
+        background: rgba(17, 24, 39, 0.96);
+        border: 1px solid var(--ring);
+        border-radius: 16px;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+      }
+      .ring-grid {
+        width: min(72vw, 320px);
+        height: min(72vw, 320px);
+      }
+      .ring-btn {
+        width: 58px;
+        height: 58px;
+        font-size: 12px;
+      }
+      .choice-btn { min-height: 54px; }
+    }
   </style>
 </head>
 <body>
@@ -101,6 +131,7 @@
       </div>
 
       <div id="responsePanel" class="response hidden">
+        <p class="response-prompt">Choose object + location, then submit.</p>
         <div class="choice-row">
           <button class="choice-btn" data-choice="car">Car</button>
           <button class="choice-btn" data-choice="truck">Truck</button>
@@ -224,27 +255,55 @@
 
   function drawCar(cx, cy, scale, similarity) {
     const w = scale;
-    const h = scale * (0.38 + similarity * 0.04);
+    const h = scale * (0.34 + similarity * 0.03);
     ctx.fillStyle = '#60a5fa';
-    ctx.fillRect(cx - w * 0.45, cy - h * 0.2, w * 0.9, h * 0.4);
+    ctx.fillRect(cx - w * 0.4, cy - h * 0.2, w * 0.8, h * 0.4);
+
     ctx.fillStyle = '#1d4ed8';
-    const roofH = h * (0.33 + similarity * 0.2);
-    ctx.fillRect(cx - w * 0.22, cy - h * 0.5, w * 0.44, roofH);
+    ctx.beginPath();
+    ctx.moveTo(cx - w * 0.2, cy - h * 0.2);
+    ctx.quadraticCurveTo(cx - w * 0.02, cy - h * 0.52, cx + w * 0.24, cy - h * 0.2);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#bfdbfe';
+    ctx.fillRect(cx - w * 0.08, cy - h * 0.36, w * 0.2, h * 0.13);
+
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = Math.max(2, w * 0.015);
+    ctx.beginPath();
+    ctx.moveTo(cx - w * 0.4, cy - h * 0.2);
+    ctx.lineTo(cx + w * 0.4, cy - h * 0.2);
+    ctx.stroke();
+
     ctx.fillStyle = '#111827';
-    ctx.beginPath(); ctx.arc(cx - w * 0.25, cy + h * 0.26, w * 0.1, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + w * 0.25, cy + h * 0.26, w * 0.1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx - w * 0.24, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + w * 0.24, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
   }
 
   function drawTruck(cx, cy, scale, similarity) {
     const w = scale;
-    const h = scale * (0.42 - similarity * 0.04);
+    const h = scale * (0.4 - similarity * 0.04);
     ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(cx - w * 0.46, cy - h * 0.24, w * (0.56 + similarity * 0.15), h * 0.48);
-    ctx.fillStyle = '#d97706';
-    ctx.fillRect(cx + w * (0.08 + similarity * 0.07), cy - h * 0.2, w * (0.32 - similarity * 0.1), h * 0.4);
+    ctx.fillRect(cx - w * 0.45, cy - h * 0.2, w * (0.52 + similarity * 0.12), h * 0.42);
+
+    ctx.fillStyle = '#b45309';
+    ctx.fillRect(cx + w * (0.03 + similarity * 0.06), cy - h * 0.18, w * (0.3 - similarity * 0.08), h * 0.4);
+
+    ctx.fillStyle = '#fdba74';
+    ctx.fillRect(cx + w * 0.1, cy - h * 0.12, w * 0.12, h * 0.12);
+
+    ctx.strokeStyle = '#7c2d12';
+    ctx.lineWidth = Math.max(2, w * 0.014);
+    ctx.beginPath();
+    ctx.moveTo(cx + w * 0.03, cy - h * 0.2);
+    ctx.lineTo(cx + w * 0.03, cy + h * 0.22);
+    ctx.stroke();
+
     ctx.fillStyle = '#111827';
-    ctx.beginPath(); ctx.arc(cx - w * 0.22, cy + h * 0.28, w * 0.1, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + w * 0.2, cy + h * 0.28, w * 0.1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx - w * 0.24, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + w * 0.03, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + w * 0.26, cy + h * 0.26, w * 0.095, 0, Math.PI * 2); ctx.fill();
   }
 
   function drawPeripheral(targetIdx, distractorCount) {
@@ -292,8 +351,9 @@
       b.dataset.idx = String(i);
       const angle = Math.atan2(p.y, p.x);
       const rr = 41;
-      b.style.left = `calc(50% + ${Math.cos(angle) * rr}% - 36px)`;
-      b.style.top = `calc(50% + ${Math.sin(angle) * rr}% - 36px)`;
+      b.style.left = `calc(50% + ${Math.cos(angle) * rr}%)`;
+      b.style.top = `calc(50% + ${Math.sin(angle) * rr}%)`;
+      b.style.transform = 'translate(-50%, -50%)';
       b.addEventListener('click', () => {
         state.pickPeripheral = i;
         [...els.ringGrid.querySelectorAll('.ring-btn')].forEach(el => el.classList.remove('selected'));
