@@ -32,7 +32,7 @@
     body { min-height: 100vh; touch-action: manipulation; }
     body.session-active { overflow: hidden; }
     .app { max-width: 800px; margin: 0 auto; padding: 12px 12px 28px; }
-    .hud { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; }
+    .hud { position: sticky; top: 0; z-index: 50; display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; padding: 8px 0; background: linear-gradient(var(--bg), rgba(15, 23, 42, 0.96)); }
     .pill { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 8px 10px; font-size: 14px; }
     .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     button { border: 1px solid var(--ring); color: var(--fg); background: var(--btn); border-radius: 12px; padding: 12px 14px; font-size: 15px; font-weight: 650; min-height: 46px; }
@@ -56,12 +56,15 @@
     .ring-btn { position: absolute; width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--ring); background: #0b1220; color: var(--fg); font-weight: 700; }
     .ring-center { width: 84px; height: 84px; border-radius: 50%; border: 2px dashed var(--ring); color: var(--muted); display: grid; place-items: center; font-size: 12px; }
     .hidden { display: none !important; }
-    #microBreak, #pauseOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.9); z-index: 90; display: grid; place-items: center; text-align: center; padding: 20px; }
+    #pauseOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.9); z-index: 90; display: grid; place-items: center; text-align: center; padding: 20px; }
     .overlay-card { background: var(--card); border: 1px solid var(--ring); border-radius: 16px; padding: 18px; max-width: 460px; }
     #summaryCanvas { width: 100%; height: 230px; border: 1px solid var(--ring); border-radius: 12px; background: #020617; margin-top: 10px; }
     @media (max-width: 760px) {
-      .app { padding-bottom: calc(240px + env(safe-area-inset-bottom)); }
+      .app { padding-bottom: calc(220px + env(safe-area-inset-bottom)); }
       #responsePanel { position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 40; margin-top: 0; background: rgba(17,24,39,.96); border: 1px solid var(--ring); border-radius: 16px; padding: 12px; box-shadow: 0 10px 26px rgba(0,0,0,.42); }
+      .controls { display: grid; grid-template-columns: 1fr 1fr; }
+      .controls #startBtn { grid-column: 1 / -1; }
+      .settings-grid { grid-template-columns: 1fr; }
       .ring-grid { width: min(72vw, 300px); height: min(72vw, 300px); }
       .ring-btn { width: 54px; height: 54px; font-size: 12px; }
     }
@@ -76,17 +79,28 @@
       <div class="pill" id="bestPill">Best level 1</div>
     </div>
 
-    <div class="controls">
-      <button class="primary" id="startBtn">Start</button>
-      <button id="pauseBtn">Pause</button>
-      <button id="contrastBtn">High Contrast: Off</button>
-      <button class="warn" id="resetBtn">Reset Data</button>
+    <div class="card">
+      <div id="stimulusWrap"><canvas id="stimulusCanvas" width="720" height="720"></canvas></div>
+      <div id="responsePanel" class="response hidden">
+        <p class="response-prompt">Choose object + location, then submit.</p>
+        <div class="choice-row">
+          <button class="choice-btn" data-choice="car">Car</button>
+          <button class="choice-btn" data-choice="truck">Truck</button>
+        </div>
+        <div class="ring-grid" id="ringGrid"><div class="ring-center">Tap location</div></div>
+        <button class="good" id="submitResponse" disabled>Submit</button>
+      </div>
     </div>
 
-    <p class="hint">Watch fixation, then identify center object (car/truck) and peripheral target location. Success = both correct.</p>
-
     <div class="card">
-      <details id="settingsPanel" open>
+      <p class="hint">Watch fixation, then identify center object (car/truck) and peripheral target location. Success = both correct.</p>
+      <div class="controls">
+        <button class="primary" id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="contrastBtn">High Contrast: Off</button>
+        <button class="warn" id="resetBtn">Reset Data</button>
+      </div>
+      <details id="settingsPanel">
         <summary><strong>Settings</strong></summary>
         <div class="settings-grid" style="margin-top:10px">
           <label>Mode
@@ -122,26 +136,12 @@
     </div>
 
     <div class="card">
-      <div id="stimulusWrap"><canvas id="stimulusCanvas" width="720" height="720"></canvas></div>
-      <div id="responsePanel" class="response hidden">
-        <p class="response-prompt">Choose object + location, then submit.</p>
-        <div class="choice-row">
-          <button class="choice-btn" data-choice="car">Car</button>
-          <button class="choice-btn" data-choice="truck">Truck</button>
-        </div>
-        <div class="ring-grid" id="ringGrid"><div class="ring-center">Tap location</div></div>
-        <button class="good" id="submitResponse" disabled>Submit</button>
-      </div>
-    </div>
-
-    <div class="card">
       <div id="summaryText"></div>
       <canvas id="summaryCanvas" class="hidden" width="720" height="240"></canvas>
       <div class="tiny" id="recentSessions"></div>
     </div>
   </div>
 
-  <div id="microBreak" class="hidden"><div class="overlay-card" id="microBreakText"></div></div>
   <div id="pauseOverlay" class="hidden"><div class="overlay-card"><h2>Paused</h2><p>Tap resume when ready.</p><button class="primary" id="resumeBtn">Resume</button></div></div>
 
 <script>
@@ -149,7 +149,6 @@
   'use strict';
   const FIX_MS = 280, FEEDBACK_MS = 320, ITI_MS = 350, ITI_JITTER = 150;
   const D_START = 500, D_MIN = 60, D_MAX = 900;
-  const BREAK_TRIAL_INTERVAL = 10, BREAK_TIME_INTERVAL_MS = 75000;
   const STORE_KEY = 'dd_sessions_v2';
   const BEST_KEY = 'dd_best_level_v2';
   const K_REVERSALS = 6;
@@ -183,8 +182,6 @@
     summaryText: document.getElementById('summaryText'),
     summaryCanvas: document.getElementById('summaryCanvas'),
     recentSessions: document.getElementById('recentSessions'),
-    microBreak: document.getElementById('microBreak'),
-    microBreakText: document.getElementById('microBreakText'),
     pauseOverlay: document.getElementById('pauseOverlay'),
     resumeBtn: document.getElementById('resumeBtn')
   };
@@ -217,9 +214,7 @@
     trialStartRT: 0,
     consecutiveSuccess: 0,
     lastDirection: 0,
-    reversals: [],
-    breakTimerStart: 0,
-    microBreakActive: false
+    reversals: []
   };
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -494,22 +489,8 @@
     return state.trials.length >= state.trialLimit;
   }
 
-  async function maybeMicroBreak() {
-    const elapsedSinceBreak = effectiveNow() - state.breakTimerStart;
-    const dueByTrials = state.trials.length > 0 && state.trials.length % BREAK_TRIAL_INTERVAL === 0;
-    const dueByTime = elapsedSinceBreak >= BREAK_TIME_INTERVAL_MS;
-    if (!dueByTrials && !dueByTime) return;
-    state.microBreakActive = true;
-    els.microBreakText.innerHTML = `<h3>Breathe / reset</h3><p>Level ${state.level}<br>Best-so-far ${state.bestLevel}</p><p class="tiny">Auto resume...</p>`;
-    els.microBreak.classList.remove('hidden');
-    await sleep(1700);
-    els.microBreak.classList.add('hidden');
-    state.breakTimerStart = effectiveNow();
-    state.microBreakActive = false;
-  }
-
   async function runTrialLoop() {
-    if (!state.running || state.paused || state.microBreakActive || shouldEndSession()) return;
+    if (!state.running || state.paused || shouldEndSession()) return;
     state.trialInProgress = true;
     resetSelections();
     state.currentTrial = makeTrialDef();
@@ -563,7 +544,6 @@
       return;
     }
 
-    await maybeMicroBreak();
     await sleep(ITI_MS + randInt(ITI_JITTER + 1));
     await runTrialLoop();
   }
@@ -653,7 +633,6 @@
     state.trialInProgress = false;
     state.sessionStart = Date.now();
     state.pausedAccumulated = 0;
-    state.breakTimerStart = state.sessionStart;
     state.sessionEndTarget = state.sessionStart + state.minutes * 60000;
     state.D = D_START;
     state.distractors = 2;
