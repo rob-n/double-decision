@@ -29,3 +29,8 @@ Single-file HTML5 cognitive training game focused on dual decisions:
 
 ## Run
 Open `double-decision.html` (or `index.html`) directly in a modern browser.
+
+## GitHub Pages compatibility note
+- `index.html` is the GitHub Pages entrypoint and intentionally redirects to `double-decision.html`.
+- Keep all gameplay/UI updates in `double-decision.html`; do not duplicate game logic in `index.html`.
+- If the entry behavior changes, verify the redirect still works on both local file open and GitHub Pages hosting.
