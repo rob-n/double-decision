@@ -52,9 +52,16 @@
     .choice-row { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
     .choice-btn { min-height: 58px; font-size: 20px; }
     .choice-btn.selected, .ring-btn.selected { outline: 3px solid var(--accent); }
+    .choice-btn:hover, .ring-btn:hover { border-color: var(--accent2); }
     .ring-grid { position: relative; width: min(82vw, 340px); height: min(82vw, 340px); margin: 0 auto; display: grid; place-items: center; }
     .ring-btn { position: absolute; width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--ring); background: #0b1220; color: var(--fg); font-weight: 700; }
-    .ring-center { width: 84px; height: 84px; border-radius: 50%; border: 2px dashed var(--ring); color: var(--muted); display: grid; place-items: center; font-size: 12px; }
+    .ring-btn.hovered { outline: 3px solid var(--accent2); }
+    .ring-center { width: 104px; height: 104px; border-radius: 50%; border: 2px dashed var(--ring); color: var(--muted); display: grid; place-items: center; font-size: 12px; padding: 8px; }
+    .ring-center.dragging { border-color: var(--accent2); color: var(--accent2); }
+    .ring-center-label { text-align: center; }
+    .ring-center-choices { display: grid; gap: 6px; width: 100%; }
+    .center-choice-btn { min-height: 34px; border-radius: 999px; border: 1px solid var(--ring); background: #0b1220; color: var(--fg); font-size: 13px; font-weight: 700; padding: 6px 8px; }
+    .center-choice-btn.selected, .center-choice-btn:hover { border-color: var(--accent2); outline: 2px solid var(--accent2); }
     .hidden { display: none !important; }
     #pauseOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.9); z-index: 90; display: grid; place-items: center; text-align: center; padding: 20px; }
     .overlay-card { background: var(--card); border: 1px solid var(--ring); border-radius: 16px; padding: 18px; max-width: 460px; }
@@ -67,6 +74,7 @@
       .settings-grid { grid-template-columns: 1fr; }
       .ring-grid { width: min(72vw, 300px); height: min(72vw, 300px); }
       .ring-btn { width: 54px; height: 54px; font-size: 12px; }
+      .ring-center { width: 96px; height: 96px; }
     }
   </style>
 </head>
@@ -87,7 +95,7 @@
           <button class="choice-btn" data-choice="car">Car</button>
           <button class="choice-btn" data-choice="truck">Truck</button>
         </div>
-        <div class="ring-grid" id="ringGrid"><div class="ring-center">Tap location</div></div>
+        <div class="ring-grid" id="ringGrid"><div class="ring-center" id="ringCenter"><span id="ringCenterLabel" class="ring-center-label">Tap location</span><div id="ringCenterChoices" class="ring-center-choices hidden"><button class="center-choice-btn" data-choice="car">Car</button><button class="center-choice-btn" data-choice="truck">Truck</button></div></div></div>
         <button class="good" id="submitResponse" disabled>Submit</button>
       </div>
     </div>
@@ -128,6 +136,12 @@
             <select id="autoStepSelect">
               <option value="on">On</option>
               <option value="off">Off</option>
+            </select>
+          </label>
+          <label>Quick submit drag
+            <select id="quickSubmitSelect">
+              <option value="off">Off</option>
+              <option value="on">On</option>
             </select>
           </label>
         </div>
@@ -174,10 +188,14 @@
     staircaseSelect: document.getElementById('staircaseSelect'),
     stepInput: document.getElementById('stepInput'),
     autoStepSelect: document.getElementById('autoStepSelect'),
+    quickSubmitSelect: document.getElementById('quickSubmitSelect'),
     settingsPanel: document.getElementById('settingsPanel'),
     canvas: document.getElementById('stimulusCanvas'),
     response: document.getElementById('responsePanel'),
     ringGrid: document.getElementById('ringGrid'),
+    ringCenter: document.getElementById('ringCenter'),
+    ringCenterLabel: document.getElementById('ringCenterLabel'),
+    ringCenterChoices: document.getElementById('ringCenterChoices'),
     submit: document.getElementById('submitResponse'),
     summaryText: document.getElementById('summaryText'),
     summaryCanvas: document.getElementById('summaryCanvas'),
@@ -200,6 +218,7 @@
     trialLimit: 45,
     staircase: '2d1u',
     autoFineStep: true,
+    quickSubmit: false,
     baseStep: 40,
     D: D_START,
     distractors: 2,
@@ -215,6 +234,11 @@
     consecutiveSuccess: 0,
     lastDirection: 0,
     reversals: []
+  };
+
+  const dragState = {
+    active: false,
+    hoveredPeripheral: null
   };
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -259,6 +283,8 @@
     state.staircase = els.staircaseSelect.value;
     state.baseStep = Math.min(80, Math.max(10, Number(els.stepInput.value) || 40));
     state.autoFineStep = els.autoStepSelect.value === 'on';
+    state.quickSubmit = els.quickSubmitSelect.value === 'on';
+    syncQuickSubmitUI();
   }
 
   function updateHUD() {
@@ -383,8 +409,9 @@
       b.style.top = `calc(50% + ${Math.sin(angle) * 41}%)`;
       b.style.transform = 'translate(-50%, -50%)';
       b.addEventListener('click', () => {
+        if (state.quickSubmit) return;
         state.pickPeripheral = i;
-        [...els.ringGrid.querySelectorAll('.ring-btn')].forEach((el) => el.classList.remove('selected'));
+        clearRingHighlights();
         b.classList.add('selected');
         refreshSubmit();
       });
@@ -392,17 +419,136 @@
     });
   }
 
+  function clearRingHighlights() {
+    [...els.ringGrid.querySelectorAll('.ring-btn')].forEach((el) => el.classList.remove('selected', 'hovered'));
+  }
+
+  function updateRingCenterText() {
+    if (!state.quickSubmit) {
+      els.ringCenterLabel.textContent = 'Tap location';
+      return;
+    }
+    els.ringCenterLabel.textContent = state.pickCenter ? 'Drag to target' : 'Tap car/truck';
+  }
+
+  function refreshCenterChoiceHighlight() {
+    [...els.ringCenterChoices.querySelectorAll('.center-choice-btn')].forEach((btn) => {
+      btn.classList.toggle('selected', btn.dataset.choice === state.pickCenter);
+    });
+  }
+
+  function syncQuickSubmitUI() {
+    els.submit.classList.toggle('hidden', state.quickSubmit);
+    document.querySelector('.choice-row').classList.toggle('hidden', state.quickSubmit);
+    els.ringCenterLabel.classList.toggle('hidden', state.quickSubmit);
+    els.ringCenterChoices.classList.toggle('hidden', !state.quickSubmit);
+    updateRingCenterText();
+    refreshCenterChoiceHighlight();
+  }
+
   function refreshSubmit() {
     els.submit.disabled = !(state.pickCenter && Number.isInteger(state.pickPeripheral));
+    updateRingCenterText();
+    refreshCenterChoiceHighlight();
   }
 
   function resetSelections() {
     state.pickCenter = null;
     state.pickPeripheral = null;
     [...document.querySelectorAll('.choice-btn')].forEach((b) => b.classList.remove('selected'));
-    [...els.ringGrid.querySelectorAll('.ring-btn')].forEach((b) => b.classList.remove('selected'));
+    clearRingHighlights();
+    dragState.active = false;
+    dragState.hoveredPeripheral = null;
+    els.ringGrid.querySelector('.ring-center')?.classList.remove('dragging');
     refreshSubmit();
   }
+
+  function ringIndexFromPointer(e) {
+    const rect = els.ringGrid.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const distance = Math.hypot(dx, dy);
+    const inner = Math.min(rect.width, rect.height) * 0.16;
+    const outer = Math.min(rect.width, rect.height) * 0.5;
+    if (distance < inner || distance > outer) return null;
+
+    const ringButtons = [...els.ringGrid.querySelectorAll('.ring-btn')];
+    let bestIndex = null;
+    let bestDist = Infinity;
+    ringButtons.forEach((btn, index) => {
+      const btnRect = btn.getBoundingClientRect();
+      const bx = btnRect.left + btnRect.width / 2;
+      const by = btnRect.top + btnRect.height / 2;
+      const d = Math.hypot(e.clientX - bx, e.clientY - by);
+      if (d < bestDist) {
+        bestDist = d;
+        bestIndex = index;
+      }
+    });
+
+    return bestDist <= Math.min(rect.width, rect.height) * 0.18 ? bestIndex : null;
+  }
+
+  function previewRingHover(idx) {
+    dragState.hoveredPeripheral = idx;
+    clearRingHighlights();
+    if (Number.isInteger(state.pickPeripheral)) {
+      els.ringGrid.querySelectorAll('.ring-btn')[state.pickPeripheral]?.classList.add('selected');
+    }
+    if (Number.isInteger(idx)) {
+      els.ringGrid.querySelectorAll('.ring-btn')[idx]?.classList.add('hovered');
+    }
+  }
+
+  function setupQuickSubmitDrag() {
+    const center = els.ringCenter;
+
+    center.addEventListener('pointerdown', (e) => {
+      if (!state.running || state.paused || !state.quickSubmit) return;
+      const centerChoiceBtn = e.target.closest('.center-choice-btn');
+      if (!centerChoiceBtn) return;
+      state.pickCenter = centerChoiceBtn.dataset.choice;
+      refreshSubmit();
+      dragState.active = true;
+      dragState.hoveredPeripheral = null;
+      center.classList.add('dragging');
+      center.setPointerCapture(e.pointerId);
+      previewRingHover(ringIndexFromPointer(e));
+      e.preventDefault();
+    });
+
+    center.addEventListener('pointermove', (e) => {
+      if (!dragState.active || !state.quickSubmit) return;
+      previewRingHover(ringIndexFromPointer(e));
+    });
+
+    center.addEventListener('pointerup', async (e) => {
+      if (!dragState.active || !state.quickSubmit) return;
+      dragState.active = false;
+      center.classList.remove('dragging');
+      center.releasePointerCapture(e.pointerId);
+      const idx = ringIndexFromPointer(e);
+      previewRingHover(null);
+      if (!Number.isInteger(idx)) return;
+      state.pickPeripheral = idx;
+      els.ringGrid.querySelectorAll('.ring-btn')[idx]?.classList.add('selected');
+      refreshSubmit();
+      await submitResponse();
+    });
+
+    center.addEventListener('pointercancel', (e) => {
+      dragState.active = false;
+      dragState.hoveredPeripheral = null;
+      center.classList.remove('dragging');
+      center.releasePointerCapture(e.pointerId);
+      previewRingHover(null);
+    });
+  }
+
 
   function makeTrialDef() {
     return {
@@ -704,12 +850,18 @@
     document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
     document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
     window.addEventListener('resize', resizeCanvas);
+    els.quickSubmitSelect.addEventListener('change', () => {
+      state.quickSubmit = els.quickSubmitSelect.value === 'on';
+      syncQuickSubmitUI();
+    });
   }
 
   function setup() {
     buildRingSelector();
+    setupQuickSubmitDrag();
     resizeCanvas();
     setupInputs();
+    syncQuickSubmitUI();
     renderRecentSessions();
     updateHUD();
     drawIdle();
